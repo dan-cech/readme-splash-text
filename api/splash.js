@@ -16,9 +16,8 @@ const CONFIG = {
     "Slop wizardry!",
     "minceraft",
     "To je co?",
-    "You may not rest now; there are monsters nearby.",
     "Bylo to hryznuti rocniku 87?",
-    "Not looking for a job :)",
+    "claude jak se to dela",
     "hello",
   ],
 
@@ -53,11 +52,11 @@ const CONFIG = {
   shadowOffsetY: 3,
 
   // Tilt, applied to the whole text (shadow + main) as one rigid group.
-  rotateDeg: -20,
+  rotateDeg: -10,
 
   // Pulse animation: scale 1 -> pulseMaxScale -> 1, looping forever.
-  pulseMaxScale: 1.1,
-  pulseDurationSec: 0.5,
+  pulseMaxScale: 1.05,
+  pulseDurationSec: 0.8,
 };
 
 // ---------------------------------------------------------------------------
