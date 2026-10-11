@@ -35,8 +35,8 @@ Paste the same embed line from above, as-is, into your own profile README:
 ![splash](https://dan-cech-splashtext.vercel.app/api/splash)
 ```
 
-That's it — no account, no deploy, nothing to set up. This is fine for casual
-use; the function is tiny and Vercel's free tier has plenty of headroom. The
+That's it. No account, no deploy, nothing to set up. This is fine for casual
+use. The function is tiny and Vercel's free tier has plenty of headroom. The
 only downside: you'll see *my* splash texts, not your own, and if I ever take
 the project down or rename it, your image stops working.
 
