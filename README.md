@@ -23,6 +23,46 @@ Paste this into your profile README (replace the URL with your own deployment):
 The README file itself never changes — only the image updates, each time it's
 loaded.
 
+## Want to use this yourself?
+
+You have two options, depending on how much control you want.
+
+### Option A: just use my link (easiest)
+
+Paste the same embed line from above, as-is, into your own profile README:
+
+```md
+![splash](https://dan-cech-splashtext.vercel.app/api/splash)
+```
+
+That's it — no account, no deploy, nothing to set up. This is fine for casual
+use; the function is tiny and Vercel's free tier has plenty of headroom. The
+only downside: you'll see *my* splash texts, not your own, and if I ever take
+the project down or rename it, your image stops working.
+
+### Option B: deploy your own copy (full control)
+
+Do this if you want your own splash list, or just want it to keep working
+independently of me.
+
+1. **Fork this repo** on GitHub (button in the top right of the repo page).
+2. **Edit your splash list** — open `api/splash.js` in your fork and change
+   the `splashes` array in the `CONFIG` block at the top to your own lines.
+   (See [Customizing](#customizing) below for everything else you can tweak.)
+3. **Deploy it on Vercel** (free account, no card required):
+   - Go to [vercel.com](https://vercel.com) and sign in with GitHub.
+   - Click **Add New → Project**, pick your fork from the list.
+   - Framework Preset: `Other`, Root Directory: `./`, leave everything else
+     default, no environment variables needed. Click **Deploy**.
+   - Vercel builds it in under a minute and gives you a URL like
+     `https://<your-project-name>.vercel.app`.
+4. **Update the embed line** in your profile README to point at your own URL:
+   ```md
+   ![splash](https://<your-project-name>.vercel.app/api/splash)
+   ```
+5. From then on, any `git push` to your fork's `main` branch auto-redeploys —
+   so changing your splash list later is just: edit, commit, push.
+
 ## Testing it
 
 Open `https://dan-cech-splashtext.vercel.app/api/splash` directly in a private/
