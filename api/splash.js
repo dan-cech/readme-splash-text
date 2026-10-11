@@ -11,14 +11,15 @@ import { join } from "path";
 const CONFIG = {
   // Pool of splash texts. One is picked at random on every request.
   splashes: [
-    "Also try Hungry mode!",
-    "100% pure splash text!",
-    "Now with extra pixels!",
-    "Powered by vibes!",
-    "Still compiling...",
-    "May contain bugs!",
-    "Over 9000 commits!",
-    "Now in 3D!",
+    "Also visit tomandesMSH!",
+    "Also visit dan-cech",
+    "Slop wizardry!",
+    "minceraft",
+    "To je co?",
+    "You may not rest now; there are monsters nearby.",
+    "Bylo to hryznuti rocniku 87?",
+    "Not looking for a job :)",
+    "hello",
   ],
 
   // Canvas size in pixels. Fixed so the embedded image doesn't jump around
