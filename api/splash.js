@@ -2,6 +2,12 @@
 // Returns a random Minecraft-style "splash text" as an animated SVG image.
 // Embed it in a README with: ![splash](https://your-deployment.vercel.app/api/splash)
 
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 // ---------------------------------------------------------------------------
 // CONFIG — tweak everything here. No other part of the file needs to change.
 // ---------------------------------------------------------------------------
@@ -28,7 +34,13 @@ const CONFIG = {
   padding: 20,
 
   // Typography
-  fontFamily: "'Courier New', Courier, monospace",
+  // Drop a .ttf file at fonts/splash.ttf (repo root) to use a custom font.
+  // It's embedded into the SVG itself, so it still works when GitHub loads
+  // this as a plain <img>. If the file isn't there, this falls back to
+  // fontFamily below with no errors.
+  customFontPath: "../fonts/splash.ttf", // relative to this file
+  customFontName: "SplashFont",
+  fontFamily: "'Courier New', Courier, monospace", // fallback stack
   fontWeight: "bold",
   baseFontSize: 32, // starting font size, shrinks automatically for long splashes
   minFontSize: 14, // never shrink smaller than this
@@ -72,6 +84,22 @@ function escapeXml(text) {
   });
 }
 
+// Load the custom .ttf (if present) once, as a base64 data URI, so it can be
+// inlined into the SVG's @font-face — GitHub renders this as a plain <img>,
+// which can't fetch a separate linked font file, so embedding is required.
+// Runs once at cold start, not per-request.
+function loadCustomFontDataUri(cfg) {
+  try {
+    const fontPath = join(__dirname, cfg.customFontPath);
+    const fontBuffer = readFileSync(fontPath);
+    return `data:font/ttf;base64,${fontBuffer.toString("base64")}`;
+  } catch {
+    return null; // no font file yet — fall back to cfg.fontFamily
+  }
+}
+
+const CUSTOM_FONT_DATA_URI = loadCustomFontDataUri(CONFIG);
+
 // Pick the largest font size (down to minFontSize) whose estimated,
 // rotated+pulsed bounding box still fits inside the padded canvas.
 function fitFontSize(text, cfg) {
@@ -104,8 +132,20 @@ function buildSvg(splash, cfg) {
   const cx = cfg.width / 2;
   const cy = cfg.height / 2;
 
+  // Only emit @font-face when a custom font was actually found on disk.
+  const fontFaceBlock = CUSTOM_FONT_DATA_URI
+    ? `@font-face {
+      font-family: '${cfg.customFontName}';
+      src: url(${CUSTOM_FONT_DATA_URI}) format('truetype');
+    }`
+    : "";
+  const fontFamilyCss = CUSTOM_FONT_DATA_URI
+    ? `'${cfg.customFontName}', ${cfg.fontFamily}`
+    : cfg.fontFamily;
+
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${cfg.width} ${cfg.height}" width="${cfg.width}" height="${cfg.height}">
   <style>
+    ${fontFaceBlock}
     @keyframes splash-pulse {
       0%, 100% { transform: rotate(${cfg.rotateDeg}deg) scale(1); }
       50%      { transform: rotate(${cfg.rotateDeg}deg) scale(${cfg.pulseMaxScale}); }
@@ -115,7 +155,7 @@ function buildSvg(splash, cfg) {
       animation: splash-pulse ${cfg.pulseDurationSec}s ease-in-out infinite;
     }
     .splash-text {
-      font-family: ${cfg.fontFamily};
+      font-family: ${fontFamilyCss};
       font-weight: ${cfg.fontWeight};
       font-size: ${fontSize}px;
       text-anchor: middle;
