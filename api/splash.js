@@ -3,10 +3,7 @@
 // Embed it in a README with: ![splash](https://your-deployment.vercel.app/api/splash)
 
 import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { join } from "path";
 
 // ---------------------------------------------------------------------------
 // CONFIG — tweak everything here. No other part of the file needs to change.
@@ -38,7 +35,7 @@ const CONFIG = {
   // It's embedded into the SVG itself, so it still works when GitHub loads
   // this as a plain <img>. If the file isn't there, this falls back to
   // fontFamily below with no errors.
-  customFontPath: "../fonts/splash.ttf", // relative to this file
+  customFontPath: "fonts/splash.ttf", // relative to the project root
   customFontName: "SplashFont",
   fontFamily: "'Courier New', Courier, monospace", // fallback stack
   fontWeight: "bold",
@@ -90,7 +87,7 @@ function escapeXml(text) {
 // Runs once at cold start, not per-request.
 function loadCustomFontDataUri(cfg) {
   try {
-    const fontPath = join(__dirname, cfg.customFontPath);
+    const fontPath = join(process.cwd(), cfg.customFontPath);
     const fontBuffer = readFileSync(fontPath);
     return `data:font/ttf;base64,${fontBuffer.toString("base64")}`;
   } catch {
