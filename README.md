@@ -84,3 +84,15 @@ Everything tunable lives in the `CONFIG` block at the top of `api/splash.js`:
 - `pulseMaxScale` / `pulseDurationSec` — pulse animation size and speed
 
 Edit the values, commit, and push — Vercel redeploys automatically.
+
+### Using a custom font
+
+Drop a `.ttf` file at `fonts/splash.ttf` (the exact filename matters — that's
+what `CONFIG.customFontPath` points at). On the next deploy, the function
+embeds it directly into the SVG as a base64 `@font-face`, which is required
+since GitHub loads this as a plain `<img>` and can't fetch a separately linked
+font file. If no file is there, it just falls back to `CONFIG.fontFamily`
+with no errors.
+
+`vercel.json` already tells Vercel to include everything under `fonts/` when
+deploying the function, so no extra setup is needed beyond adding the file.
