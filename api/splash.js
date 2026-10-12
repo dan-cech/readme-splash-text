@@ -30,6 +30,10 @@ const CONFIG = {
   // never clips at the image edges.
   padding: 20,
 
+  // Horizontal placement of the splash inside the canvas: "left" hugs the
+  // left edge (respecting padding), "center" puts it in the middle.
+  align: "left",
+
   // Typography
   // Drop a .ttf file at fonts/splash.ttf (repo root) to use a custom font.
   // It's embedded into the SVG itself, so it still works when GitHub loads
@@ -97,27 +101,31 @@ function loadCustomFontDataUri(cfg) {
 
 const CUSTOM_FONT_DATA_URI = loadCustomFontDataUri(CONFIG);
 
+// Estimated bounding box of the text once rotated and scaled up by the
+// pulse's largest size, so the animation never pokes past the edges.
+function rotatedBBox(text, size, cfg) {
+  const theta = (Math.abs(cfg.rotateDeg) * Math.PI) / 180;
+  const textWidth = text.length * size * cfg.charWidthFactor;
+  const textHeight = size * 1.2; // approx line height
+  return {
+    w:
+      (textWidth * Math.cos(theta) + textHeight * Math.sin(theta)) *
+      cfg.pulseMaxScale,
+    h:
+      (textWidth * Math.sin(theta) + textHeight * Math.cos(theta)) *
+      cfg.pulseMaxScale,
+  };
+}
+
 // Pick the largest font size (down to minFontSize) whose estimated,
 // rotated+pulsed bounding box still fits inside the padded canvas.
 function fitFontSize(text, cfg) {
-  const theta = (Math.abs(cfg.rotateDeg) * Math.PI) / 180;
   const maxW = cfg.width - cfg.padding * 2;
   const maxH = cfg.height - cfg.padding * 2;
 
   for (let size = cfg.baseFontSize; size > cfg.minFontSize; size--) {
-    const textWidth = text.length * size * cfg.charWidthFactor;
-    const textHeight = size * 1.2; // approx line height
-
-    // Bounding box of a w x h rectangle rotated by theta, then scaled up by
-    // the pulse's largest size so the animation never pokes past the edges.
-    const bboxW =
-      (textWidth * Math.cos(theta) + textHeight * Math.sin(theta)) *
-      cfg.pulseMaxScale;
-    const bboxH =
-      (textWidth * Math.sin(theta) + textHeight * Math.cos(theta)) *
-      cfg.pulseMaxScale;
-
-    if (bboxW <= maxW && bboxH <= maxH) return size;
+    const bbox = rotatedBBox(text, size, cfg);
+    if (bbox.w <= maxW && bbox.h <= maxH) return size;
   }
   return cfg.minFontSize;
 }
@@ -126,7 +134,15 @@ function buildSvg(splash, cfg) {
   const text = escapeXml(splash);
   const fontSize = fitFontSize(splash, cfg);
 
-  const cx = cfg.width / 2;
+  // When left-aligned, put the text's center just far enough in that its
+  // rotated bounding box starts at the left padding.
+  const cx =
+    cfg.align === "left"
+      ? Math.min(
+          cfg.padding + rotatedBBox(splash, fontSize, cfg).w / 2,
+          cfg.width / 2
+        )
+      : cfg.width / 2;
   const cy = cfg.height / 2;
 
   // Only emit @font-face when a custom font was actually found on disk.
